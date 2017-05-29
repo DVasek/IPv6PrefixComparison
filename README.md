@@ -65,7 +65,7 @@ Optional arguments:
 
 It is also possible to manualy change name of sample in data/test_id.out
 
-Example: **_python3 main.py --g="14" -b -t -r_**
+Example: **_python3 main.py -g="14" -b -t -r_**
 
 ### Erasing
 For erasing of generated samples it is possible to use switch **-clean** which erases data/ and graphs/ folders
