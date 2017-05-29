@@ -50,7 +50,7 @@ def id_set():
 	# check if necessary folders are created
 	if not os.path.exists(stats_path):
 		os.makedirs(stats_path)
-	if not os.path.exists(graph_path) and argparsed.g == True:
+	if not os.path.exists(graph_path) and (argparsed.g or argparsed.e):
 		os.makedirs(graph_path)
 
 	last_id = 0

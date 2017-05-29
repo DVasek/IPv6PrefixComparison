@@ -144,12 +144,12 @@ class Tree:
 	# print branching and nesting and call stats_by_depth
 	def call(self, test_id):
 		self.get_stats(self.root)
-		with open(main.stats_path + "tree_nesting_" + str(test_id) + ".out", 'w') as outfile:
+		with open(IPv6PrefixComparison.stats_path + "tree_nesting_" + str(test_id) + ".out", 'w') as outfile:
 			total = sum(int(line) for line in self.nesting)
 			if total > 0:
 				for i, data in enumerate(self.nesting):
 					outfile.write(str(i) + "\t" + str(data / total * 100) + "\n")
-		with open(main.stats_path + "tree_branching_" + str(test_id) + ".out", 'w') as outfile:
+		with open(IPv6PrefixComparison.stats_path + "tree_branching_" + str(test_id) + ".out", 'w') as outfile:
 			total = sum(int(line) for line in self.branching)
 			if total > 0:
 				for i, data in enumerate(self.branching):
@@ -158,7 +158,7 @@ class Tree:
 
 	# goes through each level of trie and gathers informations
 	def stats_by_depth(self, test_id):
-		with open(main.stats_path + "tree_depth_" + str(test_id) + ".out", 'w') as outfile:
+		with open(IPv6PrefixComparison.stats_path + "tree_depth_" + str(test_id) + ".out", 'w') as outfile:
 			print_level = [self.root]
 			max_depth = 0
 			# print level equals depth

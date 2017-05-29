@@ -17,14 +17,14 @@ def no_duplicates(inputfile, test_id, basics):
 		y = collections.Counter(x)
 	# if basic tests are enabled writes informations about duplicities
 	if basics == True:
-		with open(main.stats_path + "duplicates.out", "a") as duplicates:
+		with open(IPv6PrefixComparison.stats_path + "duplicates.out", "a") as duplicates:
 			total_sum = (sum(y.values()))
 			# gets number of keys (unique values)
 			unique_sum = (len(list(y)))
 			duplicates.write(str(test_id) + "\t" + str((total_sum - unique_sum) / total_sum * 100) + "\t" + str(total_sum) + "\t" + str(unique_sum) + "\n")
 	# writes output containing only unique values
 	outjoin = ''.join(list(y))
-	with open(main.stats_path + "filtered_input_" + str(test_id) + ".out", 'w') as outfile:
+	with open(IPv6PrefixComparison.stats_path + "filtered_input_" + str(test_id) + ".out", 'w') as outfile:
 		outfile.write(outjoin)
 
 # calculates binary distribution for each depth
@@ -69,7 +69,7 @@ def bin_distribution(inputfile, test_id):
 	final_output = ""
 	for record, total in enumerate(no_total):
 		final_output += str(total) + "\t" + str(no_zeros[record]) + "\t" + str(distribution[record]) + "\n"
-	with open(main.stats_path + "binary_distribution_" + str(test_id) + ".out", 'w') as outfile:
+	with open(IPv6PrefixComparison.stats_path + "binary_distribution_" + str(test_id) + ".out", 'w') as outfile:
 		outfile.write(final_output)
 
 # calculates distribution of prefix length
@@ -87,6 +87,6 @@ def prefix_length(inputfile, test_id):
 	for i, value in enumerate(output):
 		output2[i-1] = value/suma
 	# writes data
-	with open(main.stats_path + "prefix_length_" + str(test_id) + ".out", 'w') as outfile:
+	with open(IPv6PrefixComparison.stats_path + "prefix_length_" + str(test_id) + ".out", 'w') as outfile:
 		for i in range(1,65):
 			outfile.write(str(i) + "\t" + str(output[i]) + "\t" + str(output2[i-1])+ "\n")
