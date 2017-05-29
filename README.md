@@ -72,6 +72,8 @@ For erasing of generated samples it is possible to use switch **-clean** which e
 
 ## Examples
 
+For following examples, there is a folder named "data" which includes experimental data.
+
 Runs all tests over already existing prefix file
 
 - _python3 ./IPv6PrefixComparison.py --input="data/sada" -b -t_
