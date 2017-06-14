@@ -76,11 +76,11 @@ For following examples, there is a folder named "data" which includes experiment
 
 Runs all tests over already existing prefix file
 
-- _python3 ./IPv6PrefixComparison.py --input="data/sada" -b -t_
+- _python3 IPv6PrefixComparison.py --input="data/sada" -b -t_
 
 Runs generator ipv6TableGen for 3 times over all tests 
 
-- _python3 IPv6PrefixComparison.py --gen="python3 ipv6TableGen.py --input data/sada --output data/outsada -n 100000" -t -b -m="3"_
+- _python3 IPv6PrefixComparison.py --gen="python3 generators/ipv6TableGen.py --input data/sada --output data/outsada -n 100000" -t -b -m="3"_
 
 Calculates RMSE for generated sample and generates graphs for RMSE
 
@@ -88,7 +88,7 @@ Calculates RMSE for generated sample and generates graphs for RMSE
 
 Runs generator for all tests then generates graphs
 
-- _python3 IPv6PrefixComparison.py --gen="python3 ipv6TableGen.py --input data/sada --output data/outsada -n 10000" -t -b -g_
+- _python3 IPv6PrefixComparison.py --gen="python3 generators/ipv6TableGen.py --input data/sada --output data/outsada -n 10000" -t -b -g_
 
 Generates comparison graphs for test samples 1 and 3
 
