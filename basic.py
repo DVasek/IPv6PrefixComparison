@@ -4,6 +4,7 @@
 import collections
 import sys
 import IPv6PrefixComparison
+import math
 
 ipv6prefix = 64
 
@@ -64,7 +65,10 @@ def bin_distribution(inputfile, test_id):
 				break
 	# calculates percentage distribution for each depth
 	for position in range(0, ipv6prefix):
-		distribution[position] = no_zeros[position] / no_total[position] * 100
+		if (no_total[position] > 0):
+			distribution[position] = no_zeros[position] / no_total[position] * 100
+		else:
+			distribution[position] = 0
 	# writes results
 	final_output = ""
 	for record, total in enumerate(no_total):
