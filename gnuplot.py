@@ -26,14 +26,14 @@ def	set_common(format):
 
 # defines type of plotting (called for each graph)
 def plot(input, parameters, column):
-	if input in ["binary_distribution_","rmse_binary_distribution_"]:
-		to_plot = """plot \"""" + IPv6PrefixComparison.stats_path + input + str(parameters[0]) + """.out" using """ + str(column) + """ lc rgb "black" lw 1 ps 3 title \"""" + parameters[1] + """\", """
+	if input in ["prefix_length_", "rmse_prefix_length_","binary_distribution_", "rmse_binary_distribution_"]:
+		to_plot = """plot \"""" + IPv6PrefixComparison.stats_path + input + str(parameters[0]) + """.out" using ($0+1):""" + str(column) + """ lc rgb "#A9A9A9" w boxes title \"""" + parameters[1] + """\","""
 		if len(parameters) > 3:
-			to_plot += """\"""" + IPv6PrefixComparison.stats_path + input + str(parameters[2]) + """.out" using """ + str(column) + """ lt 0 lc rgb "#77808080" pt 1 lw 1 ps 3 title \"""" + parameters[3] + """\""""
+			to_plot +=	"""\"""" + IPv6PrefixComparison.stats_path + input + str(parameters[2]) + """.out" using ($0+1):""" + str(column) + """ w linespoints ls 1 ps 2 lw 1 lt 1 lc rgb "black" title \"""" + parameters[3] + """\""""
 	else:
-		to_plot = """plot \"""" + IPv6PrefixComparison.stats_path + input + str(parameters[0]) + """.out" using """ + str(column) + """ lt rgb "grey" w boxes title \"""" + parameters[1] + """\","""
+		to_plot = """plot \"""" + IPv6PrefixComparison.stats_path + input + str(parameters[0]) + """.out" using ($0):""" + str(column) + """ lc rgb "#A9A9A9" w boxes title \"""" + parameters[1] + """\","""
 		if len(parameters) > 3:
-			to_plot +=	"""\"""" + IPv6PrefixComparison.stats_path + input + str(parameters[2]) + """.out" using """ + str(column) + """ w linespoints ls 1 ps 2 lw 1 lt rgb "black" title \"""" + parameters[3] + """\""""
+			to_plot +=	"""\"""" + IPv6PrefixComparison.stats_path + input + str(parameters[2]) + """.out" using ($0):""" + str(column) + """ w linespoints ls 1 ps 2 lw 1 lt 1 lc rgb "black" title \"""" + parameters[3] + """\""""
 	return to_plot
 
 # saves the output of each function and start gnuplot
@@ -45,7 +45,7 @@ def generate():
 	os.remove("graphs.in")
 
 # generates graph for consumption of generator
-def hardware(format):
+def hardware(parameters, format):
 	global graphs
 	
 	if format == "png":
@@ -93,15 +93,15 @@ def hardware(format):
 	set label "Disk" at M*cos(240),M*sin(240) center offset char -1,-1
 	set style line 11 lt 1 lw 2 pt 2 ps 2
 
-	plot '""" + main.stats_path + """resources.out' using 1:2 notitle w lp, '' using 1:3 notitle w lp"""
+	plot '""" + IPv6PrefixComparison.stats_path + """resources.out' using 1:2 title \"""" + parameters[1] + """\" w lp, '' using 1:3 title \"""" + parameters[3] + """\" w lp"""
 
 # generates graphs for trie tests
-def tree(parameters, format):
+def tree(parameters, format, name):
 	global graphs
 	common = set_common(format)
 
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """tree_skew.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_tree_skew.""" + format + """\"
 	set xrange [0:64]
 	set yrange [0:1]
 	set xtics 0,2,64
@@ -111,7 +111,7 @@ def tree(parameters, format):
 	""" + plot("tree_depth_", parameters, 2)
  
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """tree_distribution.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_tree_distribution.""" + format + """\"
 	set xrange [0:64]
 	set yrange [0:100]
 	set xtics 0,2,64
@@ -121,7 +121,7 @@ def tree(parameters, format):
 	""" + plot("tree_depth_", parameters, 3)
  
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """tree_nesting.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_tree_nesting.""" + format + """\"
 	set xrange [0:32]
 	set yrange [0.1:100]
 	set xtics 0,2,32
@@ -131,7 +131,7 @@ def tree(parameters, format):
 	""" + plot("tree_nesting_", parameters, 2)
 	 
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """tree_branching.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_tree_branching.""" + format + """\"
 	set xrange [0:32]
 	set yrange [0.1:100]
 	set xtics 0,2,32
@@ -141,13 +141,13 @@ def tree(parameters, format):
 	""" + plot("tree_branching_", parameters, 2)
 
 # generates graphs for basic tests
-def basic(parameters, format):
+def basic(parameters, format, name):
 	global graphs
 	common = set_common(format)
 
 	graphs += common + """
 	set xtics 0,2,64
-	set output \"""" + IPv6PrefixComparison.graph_path + """length_distribution.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_length_distribution.""" + format + """\"
 	set xrange [0:64]
 	set yrange [0:60]
 	set ytics 0,10,60
@@ -159,7 +159,7 @@ def basic(parameters, format):
 	set key bottom right
 	set style data linespoints
 	set xtics 0,2,64
-	set output \"""" + IPv6PrefixComparison.graph_path + """binary_distribution.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_binary_distribution.""" + format + """\"
 	set xrange [0:64]
 	set yrange [0:100]
 	set ylabel "Probability of 0"
@@ -167,12 +167,12 @@ def basic(parameters, format):
 	""" + plot("binary_distribution_", parameters, 3)
 
 # generates root mean square error graphs for trie tests
-def rmse_tree(parameters, format):
+def rmse_tree(parameters, format, name):
 	global graphs
 	common = set_common(format)
 
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """rmse_tree_skew.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_rmse_tree_skew.""" + format + """\"
 	set xrange [0:64]
 	set xtics 0,2,64
 	set ylabel "RMSE"
@@ -180,7 +180,7 @@ def rmse_tree(parameters, format):
 	""" + plot("rmse_tree_skew_", parameters, 2)
 
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """rmse_tree_distribution.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_rmse_tree_distribution.""" + format + """\"
 	set xrange [0:64]
 	set xtics 0,2,64
 	set ylabel "RMSE"
@@ -188,7 +188,7 @@ def rmse_tree(parameters, format):
 	""" + plot("rmse_tree_branching_probability_", parameters, 2)
 
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """rmse_tree_nesting.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_rmse_tree_nesting.""" + format + """\"
 	set xrange [0:32]
 	set xtics 0,2,32
 	set ylabel "RMSE"
@@ -196,7 +196,7 @@ def rmse_tree(parameters, format):
 	""" + plot("rmse_tree_nesting_", parameters, 2)
 	
 	graphs += common + """
-	set output \"""" + IPv6PrefixComparison.graph_path + """rmse_tree_branching.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_rmse_tree_branching.""" + format + """\"
 	set xrange [0:32]
 	set xtics 0,2,32
 	set ylabel "RMSE"
@@ -204,13 +204,13 @@ def rmse_tree(parameters, format):
 	""" + plot("rmse_tree_branching_", parameters, 2)
 
 # generates root mean square error graphs for basic tests
-def rmse_basic(parameters, format):
+def rmse_basic(parameters, format, name):
 	global graphs
 	common = set_common(format)
 
 	graphs += common + """
 	set xtics 0,2,64
-	set output \"""" + IPv6PrefixComparison.graph_path + """rmse_length_distribution.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_rmse_length_distribution.""" + format + """\"
 	set xrange [0:64]
 	set ylabel "RMSE"
 	set xlabel "Trie depth"
@@ -219,7 +219,7 @@ def rmse_basic(parameters, format):
 	graphs += common + """
 	set style data linespoints
 	set xtics 0,2,64
-	set output \"""" + IPv6PrefixComparison.graph_path + """rmse_binary_distribution.""" + format + """\"
+	set output \"""" + IPv6PrefixComparison.graph_path + name + """_rmse_binary_distribution.""" + format + """\"
 	set xrange [0:64]
 	set ylabel "RMSE"
 	set xlabel "Trie depth"
