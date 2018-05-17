@@ -32,13 +32,15 @@ class Tree:
 	def __init__(self):
 		self.root = Node()
 		self.root.value = 1
-		self.root.nesting = 1
+		self.root.nesting = 0
 		self.nesting = [0]*(ipv6prefix+1)
 		self.branching = [0]*(ipv6prefix+1)
 
 	# parse prefix into binary
 	def add_prefix(self, prefix):
 		prefix, length = prefix.split("/")
+		if int(length) > 64:
+			return;
 		length = int(length)
 		current_length = 0
 		prefix = prefix.split(":")
@@ -60,7 +62,7 @@ class Tree:
 		for bit in binary:
 			self.add(int(bit))
 		# marks end of prefix
-		self.cursor.value += 1
+		self.cursor.value = 1
 
 	# add bit into trie
 	# set number of succesors of each node
@@ -97,7 +99,8 @@ class Tree:
 		# set depth of trie
 		node.depth = root.depth + 1
 		# set prefix nesting
-		node.nesting += root.nesting + node.value
+		if node.value != 0:
+			node.nesting += root.nesting + 1
 		# get branching
 		if root.succesors == 1:
 			node.branching = root.branching + 1
@@ -135,7 +138,10 @@ class Tree:
 			self.branching[node.branching] += 1
 		if node.value != 0:
 			if node.left == None and node.right == None:
-				self.nesting[node.nesting] += 1
+				try:
+					self.nesting[node.nesting] += 1
+				except:
+					print(str(node.nesting) + "astala")
 		if node.left != None:
 			self.get_stats(node.left)
 		if node.right != None:
