@@ -11,12 +11,13 @@ import time
 import subprocess
 import resource
 import shutil
+import random
 ######
 import basic
 import tree
 import gnuplot
 
-stats_path = "./data/"
+stats_path = "././data/"
 graph_path = "./graphs/"
 records = 0
 
@@ -133,14 +134,14 @@ def recalculate_resources(ids):
 	# add degrees on first column
 	output_data = ""
 	first_row = ""
-	dengree = 0
+	degree = 0
 	first_line = True
 	for line in zip(*resource_data):
 		begin_line = True
 		for column in line:
-			# add angle on beginning of line
+			# add degree on beginning of line
 			if begin_line:
-				output_data += str(angle) + "\t"
+				output_data += str(degree) + "\t"
 				degree += 120
 				begin_line = False
 			output_data += str(column) + "\t"
@@ -153,6 +154,30 @@ def recalculate_resources(ids):
 	# write output
 	with open(stats_path + "resources.out", "w") as resgraph:
 		resgraph.write(output_data)
+
+def rename_files(test_id):
+	tests = argparsed.m.split(",")
+	letter = len(tests[0] + ".out") + 2
+	for file in os.listdir(stats_path):
+		if file.endswith(tests[0] + ".out"):
+			if file[-letter:-letter+1].isalpha():
+				os.rename(stats_path + file, stats_path + file[:(len(file) - (len(tests[1]) + 4))] + tests[0] + "_0.out")
+	if int(test_id) == int(tests[1]):
+		lines = []
+		with open(stats_path + "test_id.out", "r") as id_file:
+			lines = id_file.readlines()
+		with open(stats_path + "test_id.out", "w") as id_file:
+			lines = lines[:-1]
+			file = "".join(lines)
+			id_file.write(file)
+
+	runs = 1
+	while os.path.isfile(stats_path + "filtered_input_" + str(tests[0]) + "_" + str(runs) + ".out") == True:
+		runs += 1
+	letter = len(tests[1] + ".out") + 2
+	for file in os.listdir(stats_path):
+		if file.endswith(tests[1] + ".out") and file[-letter:-letter+1].isalpha():
+			os.rename(stats_path + file, stats_path + file[:(len(file) - (len(tests[1]) + 4))] + tests[0] + "_" + str(runs) + ".out")
 
 # calculates root mean square error for tests
 def rmse(expected, results):
@@ -251,7 +276,7 @@ def run_tests(test_id):
 		run_trie(test_id)
 
 # generates graphs
-def generate_graphs(test_id):
+def generate_graphs(test_id, name):
 	print("printing graphs")
 	# sets output graphs as png if requested otherwise uses eps
 	format = "eps"
@@ -279,19 +304,19 @@ def generate_graphs(test_id):
 	# creates data for basic graphs
 	if argparsed.r == True and len(parameters) > 1:
 		recalculate_resources(parameters)
-		gnuplot.hardware(format)
+		gnuplot.hardware(test, format)
 	# creates data for basic graphs
 	if argparsed.e != "":
 		if argparsed.b == True:
-			gnuplot.rmse_basic(test, format)
+			gnuplot.rmse_basic(test, format, name)
 		if argparsed.t == True:
-			gnuplot.rmse_tree(test, format)
+			gnuplot.rmse_tree(test, format, name)
 	# creates data for basic graphs
 	else: 
 		if argparsed.b == True:
-			gnuplot.basic(test, format)
+			gnuplot.basic(test, format, name)
 		if argparsed.t == True:
-			gnuplot.tree(test, format)
+			gnuplot.tree(test, format, name)
 	# starts generation of graphs
 	if argparsed.r == True or argparsed.b == True or argparsed.t == True:
 		gnuplot.generate()
@@ -328,16 +353,9 @@ def main():
 				found = True
 		if output != "":
 			argparsed.input = output
-	# starts generator for n times specified by parameter m
-	if argparsed.gen != "" and argparsed.m != "":
-		past_run = [0.0, 0]
-		for x in range (0, int(argparsed.m)):
-			current_test = str(test_id) + "_" + str(x)
-			print("RUN " + str(x))
-			print("starting generator")
-			past_run = generator_resoures(current_test, past_run, arguments)
-			print("generator finished")
-			run_tests(current_test)
+	if argparsed.m != "":
+		print("merging tests")
+		rename_files(test_id)
 	# starts generator and tests
 	elif argparsed.gen != "":
 		print("starting generator")
@@ -351,9 +369,13 @@ def main():
 	if argparsed.rmse != "":
 		print("calculating rmse")
 		parameters = argparsed.rmse.split(",")
+		test_id = parameters[1]
 		rmse(parameters[0], parameters[1])
 	if argparsed.g != "" or argparsed.e != "":
-		generate_graphs(test_id)
+		name = ""
+		if argparsed.name != "":
+			name = argparsed.name
+		generate_graphs(test_id, name)
 
 
 argparsed = None
